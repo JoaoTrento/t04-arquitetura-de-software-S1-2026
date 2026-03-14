@@ -1,5 +1,40 @@
 package com.fag.lucasmartins.arquitetura_software.model.repository.impl;
 
-public class ProdutoRepositoryImpl {
-    
+import com.fag.lucasmartins.arquitetura_software.model.bo.ProdutoBO;
+import com.fag.lucasmartins.arquitetura_software.model.repository.ProdutoRepository;
+import com.fag.lucasmartins.arquitetura_software.model.repository.entity.ProdutoEntity;
+import com.fag.lucasmartins.arquitetura_software.model.repository.jpa.ProdutoJpaRepository;
+import com.fag.lucasmartins.arquitetura_software.model.repository.mapper.ProdutoEntityMapper;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+public class ProdutoRepositoryImpl implements ProdutoRepository {
+
+    private final ProdutoJpaRepository jpaRepository;
+
+    public ProdutoRepositoryImpl(ProdutoJpaRepository jpaRepository) {
+        this.jpaRepository = jpaRepository;
+    }
+
+    @Override
+    public ProdutoBO salvar(ProdutoBO bo) {
+        ProdutoEntity entity = ProdutoEntityMapper.toEntity(bo);
+
+        ProdutoEntity ProdutoCriado = jpaRepository.save(entity);
+
+        return ProdutoEntityMapper.toBo(ProdutoCriado);
+    }
+
+    @Override
+    public ProdutoBO buscarPorId(Long id) {
+        Optional<ProdutoEntity> Produto = jpaRepository.findById(id);
+
+        if (Produto.isEmpty()) {
+            throw new IllegalArgumentException("Produto não encontrado!");
+        }
+
+        return ProdutoEntityMapper.toBo(Produto.get());
+    }
 }
